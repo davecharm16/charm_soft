@@ -2,8 +2,16 @@ import type { Metadata } from "next";
 
 import { siteContent } from "@/content/site";
 
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://charmsoft.com";
+const FALLBACK_SITE_URL = "https://charmsoft.com";
+
+function normalizeSiteUrl(raw: string | undefined): string {
+  const trimmed = raw?.trim();
+  if (!trimmed) return FALLBACK_SITE_URL;
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  return withProtocol.replace(/\/$/, "");
+}
+
+export const siteUrl = normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
 export function absoluteUrl(path = "/"): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
